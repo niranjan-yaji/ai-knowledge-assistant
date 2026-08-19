@@ -1,11 +1,16 @@
+// ========================================
+// AI KNOWLEDGE ASSISTANT - CHAT JAVASCRIPT
+// ========================================
+
+// Get HTML elements
 const chatBox = document.getElementById("chatBox");
 const messageInput = document.getElementById("messageInput");
 const sendButton = document.getElementById("sendButton");
 
 
-// ===============================
+// ========================================
 // SEND MESSAGE
-// ===============================
+// ========================================
 
 async function sendMessage() {
 
@@ -17,9 +22,9 @@ async function sendMessage() {
     }
 
 
-    // -------------------------------
+    // ------------------------------------
     // Display user's message
-    // -------------------------------
+    // ------------------------------------
 
     const userMessage = document.createElement("div");
 
@@ -33,22 +38,24 @@ async function sendMessage() {
     chatBox.appendChild(userMessage);
 
 
-    // Clear input box
+    // Clear input
     messageInput.value = "";
-
 
     // Scroll to bottom
     scrollToBottom();
 
 
-    // Disable button while AI is responding
+    // ------------------------------------
+    // Disable send button
+    // ------------------------------------
+
     sendButton.disabled = true;
     sendButton.textContent = "Thinking...";
 
 
-    // -------------------------------
-    // Show temporary loading message
-    // -------------------------------
+    // ------------------------------------
+    // Show loading message
+    // ------------------------------------
 
     const loadingMessage = document.createElement("div");
 
@@ -68,9 +75,9 @@ async function sendMessage() {
 
     try {
 
-        // -------------------------------
+        // ------------------------------------
         // Send request to Flask
-        // -------------------------------
+        // ------------------------------------
 
         const response = await fetch("/chat", {
 
@@ -87,37 +94,59 @@ async function sendMessage() {
         });
 
 
-        // Try to read JSON response
-        const data = await response.json();
+        // ------------------------------------
+        // Read server response
+        // ------------------------------------
 
+        let data;
 
-        // -------------------------------
-        // Remove loading message
-        // -------------------------------
+        try {
 
-        const loading = document.getElementById("loadingMessage");
+            data = await response.json();
 
-        if (loading) {
-            loading.remove();
+        } catch (jsonError) {
+
+            throw new Error("Invalid response from server");
+
         }
 
 
-        // -------------------------------
-        // Check for server error
-        // -------------------------------
+        // ------------------------------------
+        // Remove loading message
+        // ------------------------------------
+
+        removeLoadingMessage();
+
+
+        // ------------------------------------
+        // Check server response
+        // ------------------------------------
 
         if (!response.ok) {
 
             throw new Error(
-                data.error || "Server error occurred"
+                data.error || "Server error"
             );
 
         }
 
 
-        // -------------------------------
+        // ------------------------------------
+        // Check AI response
+        // ------------------------------------
+
+        if (!data.reply) {
+
+            throw new Error(
+                "AI did not return a response"
+            );
+
+        }
+
+
+        // ------------------------------------
         // Display AI response
-        // -------------------------------
+        // ------------------------------------
 
         const botMessage = document.createElement("div");
 
@@ -138,17 +167,13 @@ async function sendMessage() {
         console.error("Chat error:", error);
 
 
-        // Remove loading message if it still exists
-        const loading = document.getElementById("loadingMessage");
-
-        if (loading) {
-            loading.remove();
-        }
+        // Remove loading message
+        removeLoadingMessage();
 
 
-        // -------------------------------
-        // Display error message
-        // -------------------------------
+        // ------------------------------------
+        // Display friendly error
+        // ------------------------------------
 
         const errorMessage = document.createElement("div");
 
@@ -157,8 +182,8 @@ async function sendMessage() {
         errorMessage.innerHTML = `
             <strong>AI Bot:</strong>
             <div>
-                Sorry, something went wrong.
-                Please try again.
+                I couldn't process that request right now.
+                Please try again in a moment. 🙂
             </div>
         `;
 
@@ -169,22 +194,40 @@ async function sendMessage() {
     }
 
 
-    // -------------------------------
+    // ------------------------------------
     // Enable button again
-    // -------------------------------
+    // ------------------------------------
 
     sendButton.disabled = false;
 
     sendButton.textContent = "Send";
 
     messageInput.focus();
+
 }
 
 
 
-// ===============================
-// SEND WITH ENTER KEY
-// ===============================
+// ========================================
+// REMOVE LOADING MESSAGE
+// ========================================
+
+function removeLoadingMessage() {
+
+    const loadingMessage =
+        document.getElementById("loadingMessage");
+
+    if (loadingMessage) {
+        loadingMessage.remove();
+    }
+
+}
+
+
+
+// ========================================
+// SEND USING ENTER KEY
+// ========================================
 
 messageInput.addEventListener("keydown", function(event) {
 
@@ -192,7 +235,10 @@ messageInput.addEventListener("keydown", function(event) {
 
         event.preventDefault();
 
-        sendMessage();
+        // Don't send while already processing
+        if (!sendButton.disabled) {
+            sendMessage();
+        }
 
     }
 
@@ -200,21 +246,23 @@ messageInput.addEventListener("keydown", function(event) {
 
 
 
-// ===============================
-// SEND BUTTON CLICK
-// ===============================
+// ========================================
+// SEND BUTTON
+// ========================================
 
 sendButton.addEventListener("click", function() {
 
-    sendMessage();
+    if (!sendButton.disabled) {
+        sendMessage();
+    }
 
 });
 
 
 
-// ===============================
+// ========================================
 // SCROLL CHAT TO BOTTOM
-// ===============================
+// ========================================
 
 function scrollToBottom() {
 
@@ -224,9 +272,9 @@ function scrollToBottom() {
 
 
 
-// ===============================
+// ========================================
 // FORMAT AI RESPONSE
-// ===============================
+// ========================================
 
 function formatResponse(text) {
 
@@ -235,11 +283,11 @@ function formatResponse(text) {
     }
 
 
-    // Escape HTML first for security
+    // Escape HTML for security
     let safeText = escapeHtml(text);
 
 
-    // Convert new lines to <br>
+    // Convert new lines into HTML line breaks
     safeText = safeText.replace(/\n/g, "<br>");
 
 
@@ -249,10 +297,10 @@ function formatResponse(text) {
 
 
 
-// ===============================
+// ========================================
 // ESCAPE HTML
 // Prevent HTML / JavaScript injection
-// ===============================
+// ========================================
 
 function escapeHtml(text) {
 
@@ -266,12 +314,14 @@ function escapeHtml(text) {
 
 
 
-// ===============================
-// INITIAL FOCUS
-// ===============================
+// ========================================
+// INITIAL PAGE LOAD
+// ========================================
 
 window.addEventListener("load", function() {
 
     messageInput.focus();
+
+    scrollToBottom();
 
 });
