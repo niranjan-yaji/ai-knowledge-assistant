@@ -6,115 +6,225 @@
 
 body {
     font-family: Arial, sans-serif;
-    background: #f2f4f7;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
+    background: #f3f4f6;
     min-height: 100vh;
+    margin: 0;
 }
 
 .chat-container {
-    width: 90%;
-    max-width: 800px;
-
+    width: 100%;
+    max-width: 900px;
+    min-height: 100vh;
+    margin: auto;
     background: white;
-
-    border-radius: 15px;
-
-    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
-
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
-.chat-header {
+/* Header */
+
+.header {
     background: #222;
     color: white;
-
-    padding: 25px;
-
+    padding: 28px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
     text-align: center;
 }
 
-.chat-header h1 {
+.bot-icon {
+    font-size: 45px;
+}
+
+.header h1 {
+    font-size: 32px;
     margin-bottom: 8px;
 }
 
-.chat-header p {
-    color: #ccc;
+.header p {
+    font-size: 17px;
+    color: #ddd;
 }
 
+/* Chat area */
+
 .chat-box {
-    height: 500px;
-
-    padding: 20px;
-
+    flex: 1;
+    padding: 25px;
     overflow-y: auto;
 }
 
 .message {
-    margin-bottom: 15px;
-    padding: 12px 15px;
-
-    border-radius: 10px;
-
     max-width: 80%;
-}
-
-.message p {
-    margin-top: 5px;
+    padding: 15px 18px;
+    margin-bottom: 18px;
+    border-radius: 15px;
+    line-height: 1.5;
+    word-wrap: break-word;
 }
 
 .bot-message {
     background: #eeeeee;
-
+    color: #111;
     margin-right: auto;
 }
 
 .user-message {
     background: #222;
     color: white;
-
     margin-left: auto;
 }
 
+.message strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Input area */
+
 .input-area {
     display: flex;
-
+    gap: 12px;
     padding: 15px;
-
     border-top: 1px solid #ddd;
+    background: white;
+    position: sticky;
+    bottom: 0;
 }
 
-.input-area input {
+#messageInput {
     flex: 1;
-
-    padding: 12px;
-
-    border: 1px solid #ccc;
-
-    border-radius: 8px;
-
+    min-width: 0;
+    padding: 14px 16px;
     font-size: 16px;
+    border: 2px solid #222;
+    border-radius: 12px;
+    outline: none;
 }
 
-.input-area button {
-    margin-left: 10px;
+#messageInput:focus {
+    border-color: #555;
+}
 
-    padding: 12px 20px;
-
+#sendButton {
+    padding: 0 25px;
     border: none;
-
-    border-radius: 8px;
-
+    border-radius: 12px;
     background: #222;
-
     color: white;
-
+    font-size: 16px;
     cursor: pointer;
+    white-space: nowrap;
 }
 
-.input-area button:hover {
+#sendButton:hover {
     background: #444;
+}
+
+/* Developer */
+
+.developer {
+    text-align: center;
+    padding: 12px;
+    font-size: 13px;
+    color: #777;
+    background: #fafafa;
+}
+
+.developer strong {
+    color: #222;
+}
+
+/* Tablet */
+
+@media (max-width: 768px) {
+
+    .header {
+        padding: 22px 15px;
+    }
+
+    .bot-icon {
+        font-size: 38px;
+    }
+
+    .header h1 {
+        font-size: 25px;
+    }
+
+    .header p {
+        font-size: 15px;
+    }
+
+    .chat-box {
+        padding: 18px 15px;
+    }
+
+    .message {
+        max-width: 90%;
+    }
+}
+
+/* Mobile */
+
+@media (max-width: 480px) {
+
+    body {
+        background: white;
+    }
+
+    .chat-container {
+        width: 100%;
+        min-height: 100vh;
+    }
+
+    .header {
+        padding: 20px 12px;
+        gap: 8px;
+    }
+
+    .bot-icon {
+        font-size: 32px;
+    }
+
+    .header h1 {
+        font-size: 21px;
+    }
+
+    .header p {
+        font-size: 13px;
+        line-height: 1.4;
+    }
+
+    .chat-box {
+        padding: 15px 10px;
+    }
+
+    .message {
+        max-width: 94%;
+        padding: 12px 14px;
+        font-size: 15px;
+        border-radius: 12px;
+    }
+
+    .input-area {
+        padding: 10px;
+        gap: 8px;
+    }
+
+    #messageInput {
+        padding: 12px;
+        font-size: 15px;
+    }
+
+    #sendButton {
+        padding: 0 17px;
+        font-size: 15px;
+    }
+
+    .developer {
+        font-size: 12px;
+        padding: 10px;
+    }
 }

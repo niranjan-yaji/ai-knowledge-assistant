@@ -2,10 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+
+    <!-- Important for mobile responsiveness -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>AI Knowledge Assistant</title>
 
+    <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
@@ -13,39 +16,72 @@
 
     <div class="chat-container">
 
-        <div class="chat-header">
-            <h1>🤖 AI Knowledge Assistant</h1>
-            <p>Ask me about countries, companies, technology, science and more.</p>
-        </div>
+        <!-- Header -->
+        <header class="header">
 
-        <div id="chat-box" class="chat-box">
-
-            <div class="message bot-message">
-                <strong>AI Bot:</strong>
-                <p>Hello! 👋 Ask me anything.</p>
+            <div class="bot-icon">
+                🤖
             </div>
 
-        </div>
+            <div class="header-content">
+                <h1>AI Knowledge Assistant</h1>
 
+                <p>
+                    Ask me about countries, companies,
+                    technology, science and more.
+                </p>
+            </div>
+
+        </header>
+
+
+        <!-- Chat Messages -->
+        <main class="chat-box" id="chatBox">
+
+            <!-- Initial Bot Message -->
+            <div class="message bot-message">
+
+                <strong>AI Bot:</strong>
+
+                <div>
+                    Hello! 👋 Ask me anything.
+                </div>
+
+            </div>
+
+        </main>
+
+
+        <!-- Input Area -->
         <div class="input-area">
 
             <input
                 type="text"
-                id="user-input"
+                id="messageInput"
                 placeholder="Ask something..."
                 autocomplete="off"
             >
 
-            <button onclick="sendMessage()">
+            <button id="sendButton">
                 Send
             </button>
 
         </div>
 
+
+        <!-- Developer Information -->
+        <footer class="developer">
+
+            Developed by
+            <strong>Niranjan Yaji</strong>
+
+        </footer>
+
     </div>
 
+
+    <!-- JavaScript -->
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 
 </body>
 </html>
-
