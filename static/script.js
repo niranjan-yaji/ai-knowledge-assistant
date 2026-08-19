@@ -1,44 +1,76 @@
+const chatBox = document.getElementById("chatBox");
+const messageInput = document.getElementById("messageInput");
+const sendButton = document.getElementById("sendButton");
+
+
+// ===============================
+// SEND MESSAGE
+// ===============================
+
 async function sendMessage() {
 
-    const input = document.getElementById("user-input");
-    const chatBox = document.getElementById("chat-box");
+    const message = messageInput.value.trim();
 
-    const message = input.value.trim();
-
+    // Don't send empty messages
     if (message === "") {
         return;
     }
 
-    // Show user message
+
+    // -------------------------------
+    // Display user's message
+    // -------------------------------
+
     const userMessage = document.createElement("div");
 
     userMessage.className = "message user-message";
 
     userMessage.innerHTML = `
         <strong>You:</strong>
-        <p>${message}</p>
+        <div>${escapeHtml(message)}</div>
     `;
 
     chatBox.appendChild(userMessage);
 
-    input.value = "";
 
-    // Show loading message
+    // Clear input box
+    messageInput.value = "";
+
+
+    // Scroll to bottom
+    scrollToBottom();
+
+
+    // Disable button while AI is responding
+    sendButton.disabled = true;
+    sendButton.textContent = "Thinking...";
+
+
+    // -------------------------------
+    // Show temporary loading message
+    // -------------------------------
+
     const loadingMessage = document.createElement("div");
 
     loadingMessage.className = "message bot-message";
 
+    loadingMessage.id = "loadingMessage";
+
     loadingMessage.innerHTML = `
         <strong>AI Bot:</strong>
-        <p>Thinking...</p>
+        <div>Thinking...</div>
     `;
 
     chatBox.appendChild(loadingMessage);
 
-    chatBox.scrollTop = chatBox.scrollHeight;
+    scrollToBottom();
 
 
     try {
+
+        // -------------------------------
+        // Send request to Flask
+        // -------------------------------
 
         const response = await fetch("/chat", {
 
@@ -55,45 +87,191 @@ async function sendMessage() {
         });
 
 
+        // Try to read JSON response
         const data = await response.json();
 
 
-        if (data.reply) {
+        // -------------------------------
+        // Remove loading message
+        // -------------------------------
 
-            loadingMessage.innerHTML = `
-                <strong>AI Bot:</strong>
-                <p>${data.reply}</p>
-            `;
+        const loading = document.getElementById("loadingMessage");
 
-        } else {
+        if (loading) {
+            loading.remove();
+        }
 
-            loadingMessage.innerHTML = `
-                <strong>AI Bot:</strong>
-                <p>Sorry, something went wrong.</p>
-            `;
+
+        // -------------------------------
+        // Check for server error
+        // -------------------------------
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error || "Server error occurred"
+            );
 
         }
 
+
+        // -------------------------------
+        // Display AI response
+        // -------------------------------
+
+        const botMessage = document.createElement("div");
+
+        botMessage.className = "message bot-message";
+
+        botMessage.innerHTML = `
+            <strong>AI Bot:</strong>
+            <div>${formatResponse(data.reply)}</div>
+        `;
+
+        chatBox.appendChild(botMessage);
+
+        scrollToBottom();
+
+
     } catch (error) {
 
-        console.error(error);
+        console.error("Chat error:", error);
 
-        loadingMessage.innerHTML = `
+
+        // Remove loading message if it still exists
+        const loading = document.getElementById("loadingMessage");
+
+        if (loading) {
+            loading.remove();
+        }
+
+
+        // -------------------------------
+        // Display error message
+        // -------------------------------
+
+        const errorMessage = document.createElement("div");
+
+        errorMessage.className = "message bot-message";
+
+        errorMessage.innerHTML = `
             <strong>AI Bot:</strong>
-            <p>Unable to connect to the server.</p>
+            <div>
+                Sorry, something went wrong.
+                Please try again.
+            </div>
         `;
+
+        chatBox.appendChild(errorMessage);
+
+        scrollToBottom();
 
     }
 
-    chatBox.scrollTop = chatBox.scrollHeight;
+
+    // -------------------------------
+    // Enable button again
+    // -------------------------------
+
+    sendButton.disabled = false;
+
+    sendButton.textContent = "Send";
+
+    messageInput.focus();
 }
 
 
-// Press Enter to send
-document.getElementById("user-input").addEventListener("keypress", function(event) {
+
+// ===============================
+// SEND WITH ENTER KEY
+// ===============================
+
+messageInput.addEventListener("keydown", function(event) {
 
     if (event.key === "Enter") {
+
+        event.preventDefault();
+
         sendMessage();
+
     }
+
+});
+
+
+
+// ===============================
+// SEND BUTTON CLICK
+// ===============================
+
+sendButton.addEventListener("click", function() {
+
+    sendMessage();
+
+});
+
+
+
+// ===============================
+// SCROLL CHAT TO BOTTOM
+// ===============================
+
+function scrollToBottom() {
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+}
+
+
+
+// ===============================
+// FORMAT AI RESPONSE
+// ===============================
+
+function formatResponse(text) {
+
+    if (!text) {
+        return "Sorry, I didn't receive a response.";
+    }
+
+
+    // Escape HTML first for security
+    let safeText = escapeHtml(text);
+
+
+    // Convert new lines to <br>
+    safeText = safeText.replace(/\n/g, "<br>");
+
+
+    return safeText;
+
+}
+
+
+
+// ===============================
+// ESCAPE HTML
+// Prevent HTML / JavaScript injection
+// ===============================
+
+function escapeHtml(text) {
+
+    const div = document.createElement("div");
+
+    div.textContent = text;
+
+    return div.innerHTML;
+
+}
+
+
+
+// ===============================
+// INITIAL FOCUS
+// ===============================
+
+window.addEventListener("load", function() {
+
+    messageInput.focus();
 
 });
