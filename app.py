@@ -35,6 +35,27 @@ def chat():
             "error": "Message cannot be empty"
         }), 400
 
+    # Convert question to lowercase
+    question = user_message.lower()
+
+    # Questions about the developer
+    developer_questions = [
+        "who built you",
+        "who developed you",
+        "who is your developer",
+        "who created you",
+        "who made you",
+        "who created this bot",
+        "who developed this bot",
+        "who is the developer"
+    ]
+
+    # Check if user is asking about the developer
+    if any(q in question for q in developer_questions):
+        return jsonify({
+            "reply": "I was developed by Niranjan Yaji."
+        })
+
     try:
 
         response = client.models.generate_content(
@@ -53,7 +74,6 @@ def chat():
         return jsonify({
             "error": "Sorry, I couldn't process your request."
         }), 500
-
 
 if __name__ == "__main__":
     app.run(debug=True)
