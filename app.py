@@ -35,36 +35,90 @@ def chat():
             "error": "Message cannot be empty"
         }), 400
 
-    # Convert question to lowercase
+    # Convert question to lowercase for checking
     question = user_message.lower()
 
-    # Questions about the developer
-    developer_questions = [
+    # -----------------------------------------
+    # BOT CREATOR / OWNER / DEVELOPER QUESTIONS
+    # -----------------------------------------
+
+    existence_keywords = [
         "who built you",
-        "who developed you",
-        "who is your developer",
+        "who build you",
         "who created you",
+        "who create you",
+        "who developed you",
+        "who develop you",
         "who made you",
+        "who make you",
+        "who is your developer",
+        "who is your creator",
+        "who is your owner",
+        "who owns you",
+        "who wrote your code",
+        "who written your code",
+        "who coded you",
+        "who programmed you",
         "who created this bot",
+        "who made this bot",
         "who developed this bot",
-        "who is the developer"
+        "who built this bot",
+        "who is the developer of this bot",
+        "who is the creator of this bot",
+        "who is the owner of this bot",
+        "who is niranjan yaji"
     ]
 
-    # Check if user is asking about the developer
-    if any(q in question for q in developer_questions):
+    # Answer directly without using Gemini
+    if any(keyword in question for keyword in existence_keywords):
         return jsonify({
-            "reply": "I was developed by Niranjan Yaji."
+            "reply": (
+                "I was built and developed by Niranjan Yaji. "
+                "Niranjan Yaji is my creator, developer, and owner."
+            )
         })
 
     try:
 
+        # Give Gemini instructions about the purpose of the bot
+        prompt = f"""
+You are an AI Knowledge Assistant.
+
+Answer only general knowledge questions related to topics such as:
+- Countries and capitals
+- Geography
+- Companies
+- Technology
+- Science
+- Computers
+- History
+- Education
+- General knowledge
+
+If you know the answer, provide a clear and correct answer.
+
+If the question is outside general knowledge, inappropriate, unclear,
+or you genuinely do not know the answer, reply with exactly:
+
+Sorry, I can't answer. Ask general knowledge questions only.
+
+User question:
+{user_message}
+"""
+
         response = client.models.generate_content(
             model="gemini-3.5-flash-lite",
-            contents=user_message
+            contents=prompt
         )
 
+        reply = response.text.strip() if response.text else ""
+
+        # If Gemini returns no answer
+        if not reply:
+            reply = "Sorry, I can't answer. Ask general knowledge questions only."
+
         return jsonify({
-            "reply": response.text
+            "reply": reply
         })
 
     except Exception as e:
@@ -72,8 +126,9 @@ def chat():
         print("Gemini error:", e)
 
         return jsonify({
-            "error": "Sorry, I couldn't process your request."
-        }), 500
+            "reply": "Sorry, I can't answer. Ask general knowledge questions only."
+        }), 200
+
 
 if __name__ == "__main__":
     app.run(debug=True)
